@@ -26,15 +26,15 @@
         --table-bd:#ccc;
 
         /* 正解強調（淺色） */
-        --ans-chip-bg:#e6f4ea; --ans-chip-fg:#137333;
-        --ans-cell-bg:#f2fbf4; --ans-cell-bd:#cfe9d6;
+        --ans-chip-bg:#e7f6ec; --ans-chip-fg:#136d3a;
+        --ans-row-bg:#f5fbf7; --ans-row-bd:#cce8d5;
       }
       body.dark {
         --bg:#121212; --txt:#fff; --card:#1e1e1e; --rule:#333; --table-bd:#444; --muted:#aaa;
 
         /* 正解強調（深色） */
-        --ans-chip-bg:#163b22; --ans-chip-fg:#7ee2a8;
-        --ans-cell-bg:#0f2417; --ans-cell-bd:#1f3a2a;
+        --ans-chip-bg:#1f3a29; --ans-chip-fg:#b9f6ca;
+        --ans-row-bg:#12301f; --ans-row-bd:#2c5a3f;
       }
 
       html, body { height: 100%; }
@@ -42,7 +42,8 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 40px;
-        font-size: clamp(14px, 1.1vw + 10px, 18px);
+        /* ↑↑ 調高基礎自適應字級上限：原 18px → 22px，並稍微放大基準 */
+        font-size: clamp(15px, 0.9vw + 12px, 22px);
         background: var(--bg);
         color: var(--txt);
         transition: background-color .4s, color .4s;
@@ -80,29 +81,21 @@
 
       /* 表格與響應式容器 */
       .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      table {
-        width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 1em;
-        min-width: 480px; /* 降低 min-width，手機較不爆版 */
-      }
+      table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 1em; min-width: 460px; }
       th, td {
         border: 1px solid var(--table-bd); padding: 12px 14px; text-align: left; vertical-align: top;
-        color: var(--txt);
-        word-break: break-word; /* 長字換行 */
+        color: var(--txt); word-break: break-word;
       }
       tr.wrong { background-color: #ffe6e6; }
-      body.dark tr.wrong { background-color: #661111; }
+      body.dark tr.wrong { background-color: #5a1a1a; }
+      body.dark tr.wrong td { color: #fff; }
 
-      /* 正解強調（標籤＋儲存格背景） */
-      .ans-chip {
-        display:inline-block; padding:2px 8px; border-radius:999px;
-        background: var(--ans-chip-bg); color: var(--ans-chip-fg); font-size:.9em; margin-right:6px;
-      }
-      .ans-cell {
-        background: var(--ans-cell-bg);
-        border-left: 3px solid var(--ans-cell-bd);
-      }
+      .ans-chip { display:inline-block; padding:2px 8px; border-radius:999px; background: var(--ans-chip-bg); color: var(--ans-chip-fg); font-size:.9em; margin-right:6px; }
+      .ans-cell  { background: var(--ans-row-bg); border-left: 3px solid var(--ans-row-bd); }
+      .opt-row { display:block; padding:4px 6px; margin:2px 0; border-radius:6px; }
+      .opt-row.is-correct { background: var(--ans-row-bg); border-left: 3px solid var(--ans-row-bd); }
 
-      /* 右上角按鈕固定，不會被蓋住 */
+      /* 右上角按鈕固定 */
       #darkModeToggle, #homeBtn {
         position: fixed; right: 20px; padding: 10px 16px; border: none; border-radius: 8px;
         cursor: pointer; font-size: .95em; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,.15);
@@ -124,10 +117,24 @@
         #darkModeToggle { top: 12px; }
         #homeBtn { top: 56px; }
       }
+      @media (max-width: 540px) {
+        /* 手機上把「您的答案」隱藏，保留題目/正解/OX，避免擠爆 */
+        #results table th:nth-child(2), #results table td:nth-child(2) { display:none; }
+      }
       @media (max-width: 420px) {
-        #bank .controls {
-          display: grid; grid-template-columns: 1fr; gap: 8px;
-        }
+        #bank .controls { display: grid; grid-template-columns: 1fr; gap: 8px; }
+      }
+
+      /* —— 新增：超大螢幕加碼放大 —— */
+      @media (min-width: 1600px) {
+        body { font-size: clamp(18px, 0.6vw + 12px, 24px); }
+        #container { max-width: 1400px; }
+        h1, h2 { font-size: 2rem; }
+      }
+      @media (min-width: 2200px) {
+        body { font-size: clamp(20px, 0.5vw + 14px, 26px); }
+        #container { max-width: 1600px; }
+        h1, h2 { font-size: 2.2rem; }
       }
 
       /* 預載深色（head 腳本使用），load 後會移除 */
@@ -163,7 +170,7 @@
         </div>
       </div>
 
-      <!-- 測驗頁（已移除題庫瀏覽按鈕） -->
+      <!-- 測驗頁 -->
       <div id="quiz" class="hidden">
         <div style="display:flex; align-items:center; gap:8px;">
           <span id="welcomeName"></span>
@@ -279,7 +286,7 @@
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
 
-        /* ====== 深色模式：持久化與同步 ====== */
+        /* ====== 深色模式：持久化 ====== */
         const darkBtn = document.getElementById("darkModeToggle");
         function applyInitialTheme() {
           try {
@@ -291,7 +298,6 @@
           document.documentElement.classList.remove('preload-dark');
         }
         applyInitialTheme();
-
         darkBtn.addEventListener('click', function(){
           const willDark = !document.body.classList.contains('dark');
           document.body.classList.toggle('dark', willDark);
@@ -413,10 +419,12 @@
             const tr = document.createElement("tr");
             const num = (sel === 'all') ? (idx + 1) : (start + idx + 1);
             const correctText = q.options.find(o => o.charAt(0) === q.answer) || "";
+
             const optsHtml = q.options.map(o => {
-              const mark = (o.charAt(0) === q.answer) ? '<span class="ans-chip">正解</span>' : "";
-              return mark + o;
-            }).join("<br>");
+              const isC = (o.charAt(0) === q.answer);
+              return `<span class="opt-row ${isC ? 'is-correct' : ''}">${isC ? '<span class="ans-chip">正解</span>' : ''}${o}</span>`;
+            }).join("");
+
             tr.innerHTML =
               '<td class="mono">#' + num + "</td>" +
               "<td>" + q.question + "</td>" +
