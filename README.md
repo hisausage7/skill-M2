@@ -42,7 +42,7 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 40px;
-        /* ↑ 調高基礎自適應字級上限：22px → 24px，並提高增長率 */
+        /* 基礎自適應字級（桌機普遍上限 24px） */
         font-size: clamp(16px, 1.1vw + 12px, 24px);
         background: var(--bg);
         color: var(--txt);
@@ -50,7 +50,6 @@
       }
 
       #container {
-        /* ↑ 容器加寬：1200 → 1320 */
         max-width: 1320px; margin: auto; background: var(--card); padding: 40px;
         border-radius: 20px; box-shadow: 0 0 10px rgba(0,0,0,.1);
         transition: background-color .4s, color .4s;
@@ -130,7 +129,7 @@
         #bank .controls { display: grid; grid-template-columns: 1fr; gap: 8px; }
       }
 
-      /* —— 大螢幕加碼放大 —— */
+      /* —— 大螢幕加碼放大（到 4K 前） —— */
       @media (min-width: 1200px) {
         body       { font-size: clamp(18px, 0.9vw + 12px, 26px); }
         #container { max-width: 1440px; }
@@ -145,6 +144,13 @@
         body       { font-size: clamp(22px, 0.6vw + 14px, 32px); }
         #container { max-width: 1920px; }
         h1, h2     { font-size: 2.4rem; }
+      }
+
+      /* —— 2560×1440（含以上）專用上限 —— */
+      @media (min-width: 2560px) and (min-height: 1400px) {
+        body       { font-size: clamp(22px, 0.55vw + 16px, 34px); } /* 上限 34px */
+        #container { max-width: 2000px; }
+        h1, h2     { font-size: 2.6rem; }
       }
 
       /* 預載深色（head 腳本使用），load 後會移除 */
