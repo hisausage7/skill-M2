@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>147測驗｜單一檔案版</title>
 
-    <!-- 在繪製前套用主題，避免閃爍 -->
+    <!-- 預先套用主題避免閃爍 -->
     <script>
       (function () {
         try {
@@ -24,9 +24,20 @@
         --primary:#007bff; --primary-800:#0056b3; --danger:#dc3545;
         --green:#28a745; --green-800:#218838; --teal:#17a2b8; --teal-800:#138496;
         --table-bd:#ccc;
+
+        /* 正解強調（淺色） */
+        --ans-chip-bg:#e6f4ea; --ans-chip-fg:#137333;
+        --ans-cell-bg:#f2fbf4; --ans-cell-bd:#cfe9d6;
       }
+      body.dark {
+        --bg:#121212; --txt:#fff; --card:#1e1e1e; --rule:#333; --table-bd:#444; --muted:#aaa;
+
+        /* 正解強調（深色） */
+        --ans-chip-bg:#163b22; --ans-chip-fg:#7ee2a8;
+        --ans-cell-bg:#0f2417; --ans-cell-bd:#1f3a2a;
+      }
+
       html, body { height: 100%; }
-      /* 基礎字級會隨螢幕大小調整 */
       body {
         font-family: Arial, sans-serif;
         margin: 0;
@@ -36,8 +47,6 @@
         color: var(--txt);
         transition: background-color .4s, color .4s;
       }
-      /* 深色主題（套在 body 上） */
-      body.dark { --bg:#121212; --txt:#fff; --card:#1e1e1e; --rule:#333; --table-bd:#444; --muted:#aaa; }
 
       #container {
         max-width: 1200px; margin: auto; background: var(--card); padding: 40px;
@@ -47,12 +56,11 @@
 
       .hidden { display: none; }
       h1, h2 { text-align: center; font-size: 1.6em; margin: .2em 0 .6em; }
-
-      #rules { background: var(--rule); padding: 16px; margin-bottom: 28px; border-radius: 10px; font-size: .9em; }
+      #rules { background: var(--rule); padding: 16px; margin-bottom: 28px; border-radius: 10px; font-size: .95em; }
 
       .btn {
         background: var(--primary); color: #fff; border: none; padding: 14px 24px;
-        margin: 8px; border-radius: 10px; cursor: pointer; font-size: .9em;
+        margin: 8px; border-radius: 10px; cursor: pointer; font-size: .95em;
         transition: background-color .2s, transform .1s;
         white-space: nowrap;
       }
@@ -72,56 +80,61 @@
 
       /* 表格與響應式容器 */
       .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-      table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: .9em; min-width: 640px; }
-      th, td { border: 1px solid var(--table-bd); padding: 12px 14px; text-align: left; vertical-align: top; }
+      table {
+        width: 100%; border-collapse: collapse; margin-top: 16px; font-size: 1em;
+        min-width: 480px; /* 降低 min-width，手機較不爆版 */
+      }
+      th, td {
+        border: 1px solid var(--table-bd); padding: 12px 14px; text-align: left; vertical-align: top;
+        color: var(--txt);
+        word-break: break-word; /* 長字換行 */
+      }
       tr.wrong { background-color: #ffe6e6; }
       body.dark tr.wrong { background-color: #661111; }
 
-      /* 右上角按鈕：改為 fixed，任何頁面都能點到 */
+      /* 正解強調（標籤＋儲存格背景） */
+      .ans-chip {
+        display:inline-block; padding:2px 8px; border-radius:999px;
+        background: var(--ans-chip-bg); color: var(--ans-chip-fg); font-size:.9em; margin-right:6px;
+      }
+      .ans-cell {
+        background: var(--ans-cell-bg);
+        border-left: 3px solid var(--ans-cell-bd);
+      }
+
+      /* 右上角按鈕固定，不會被蓋住 */
       #darkModeToggle, #homeBtn {
         position: fixed; right: 20px; padding: 10px 16px; border: none; border-radius: 8px;
-        cursor: pointer; font-size: .9em; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,.15);
+        cursor: pointer; font-size: .95em; z-index: 2000; box-shadow: 0 4px 12px rgba(0,0,0,.15);
       }
       #darkModeToggle { top: 20px; background: #333; color: #fff; }
       #darkModeToggle:hover { background: #555; }
       #homeBtn { top: 68px; background: var(--green); color: #fff; text-decoration: none; }
       #homeBtn:hover { background: var(--green-800); }
 
-      /* 題庫瀏覽區塊 */
-      #bank .controls {
-        display: grid;
-        grid-template-columns: 1fr auto auto;
-        gap: 12px; align-items: center; margin: 10px 0 12px;
-      }
-      #bank .controls input[type="text"] {
-        width: 100%; padding: 10px 12px; font-size: 1em; border-radius: 8px; border: 1px solid #bbb;
-        background: transparent; color: inherit;
-      }
-      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
-      .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: .8em; }
-      .tag.correct { background: #e6f4ea; color: #137333; }
-      body.dark .tag.correct { background: #163b22; color: #7ee2a8; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Courier New", monospace; }
       .muted { opacity: .8; color: var(--muted); }
 
       /* 小尺寸優化 */
       @media (max-width: 768px) {
-        body { padding: 20px; }
+        body { padding: 20px; font-size: clamp(14px, 2.2vw + 8px, 17px); }
         #container { padding: 20px; border-radius: 16px; }
-        .btn { padding: 12px 16px; margin: 6px; }
+        .btn { padding: 12px 16px; margin: 6px; font-size: .95em; }
         #darkModeToggle, #homeBtn { right: 12px; }
         #darkModeToggle { top: 12px; }
         #homeBtn { top: 56px; }
       }
       @media (max-width: 420px) {
-        #bank .controls { grid-template-columns: 1fr; gap: 8px; }
+        #bank .controls {
+          display: grid; grid-template-columns: 1fr; gap: 8px;
+        }
       }
 
-      /* 預載深色（在 head 腳本用於防閃爍），load 後由 body.dark 接手 */
+      /* 預載深色（head 腳本使用），load 後會移除 */
       .preload-dark body, .preload-dark { background:#121212; color:#fff; }
     </style>
   </head>
   <body>
-    <!-- 吃飽太閒做的網站，能幫到你我覺得很開心 -->
     <button id="darkModeToggle" aria-pressed="false">深色模式 / Dark Mode</button>
     <a id="homeBtn" href="https://hisausage7.github.io/147test/" title="回首頁">🏠 回首頁</a>
 
@@ -186,7 +199,7 @@
         <div id="scoreSummary" style="text-align:center;margin-top:12px;font-size:1em"></div>
       </div>
 
-      <!-- 題庫瀏覽頁（預設顯示答案；已移除顯示開關） -->
+      <!-- 題庫瀏覽頁 -->
       <div id="bank" class="hidden">
         <h2>題庫瀏覽 / Question Bank</h2>
         <div class="controls">
@@ -275,7 +288,6 @@
             document.body.classList.toggle('dark', isDark);
             darkBtn.setAttribute('aria-pressed', String(isDark));
           } catch(e) {}
-          // 移除 head 的預載狀態
           document.documentElement.classList.remove('preload-dark');
         }
         applyInitialTheme();
@@ -402,14 +414,14 @@
             const num = (sel === 'all') ? (idx + 1) : (start + idx + 1);
             const correctText = q.options.find(o => o.charAt(0) === q.answer) || "";
             const optsHtml = q.options.map(o => {
-              const mark = (o.charAt(0) === q.answer) ? '<span class="tag correct">正解</span> ' : "";
+              const mark = (o.charAt(0) === q.answer) ? '<span class="ans-chip">正解</span>' : "";
               return mark + o;
             }).join("<br>");
             tr.innerHTML =
               '<td class="mono">#' + num + "</td>" +
               "<td>" + q.question + "</td>" +
               "<td>" + optsHtml + "</td>" +
-              '<td class="mono">' + (q.answer + "｜" + correctText) + "</td>";
+              '<td class="mono ans-cell">' + (q.answer + "｜" + correctText) + "</td>";
             bankBody.append(tr);
           });
 
@@ -480,7 +492,7 @@
             tr.innerHTML =
               "<td>" + a.q.question + "</td>" +
               "<td>" + a.selectedText + "</td>" +
-              "<td>" + a.correctText + "</td>" +
+              '<td class="ans-cell">' + a.correctText + "</td>" +
               "<td>" + (a.correct ? "O" : "X") + "</td>";
             if (!a.correct) tr.classList.add("wrong");
             tb.append(tr);
