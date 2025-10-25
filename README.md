@@ -42,15 +42,16 @@
         font-family: Arial, sans-serif;
         margin: 0;
         padding: 40px;
-        /* ↑↑ 調高基礎自適應字級上限：原 18px → 22px，並稍微放大基準 */
-        font-size: clamp(15px, 0.9vw + 12px, 22px);
+        /* ↑ 調高基礎自適應字級上限：22px → 24px，並提高增長率 */
+        font-size: clamp(16px, 1.1vw + 12px, 24px);
         background: var(--bg);
         color: var(--txt);
         transition: background-color .4s, color .4s;
       }
 
       #container {
-        max-width: 1200px; margin: auto; background: var(--card); padding: 40px;
+        /* ↑ 容器加寬：1200 → 1320 */
+        max-width: 1320px; margin: auto; background: var(--card); padding: 40px;
         border-radius: 20px; box-shadow: 0 0 10px rgba(0,0,0,.1);
         transition: background-color .4s, color .4s;
       }
@@ -86,14 +87,18 @@
         border: 1px solid var(--table-bd); padding: 12px 14px; text-align: left; vertical-align: top;
         color: var(--txt); word-break: break-word;
       }
+
+      /* 錯題列色（深色模式改亮字） */
       tr.wrong { background-color: #ffe6e6; }
       body.dark tr.wrong { background-color: #5a1a1a; }
       body.dark tr.wrong td { color: #fff; }
 
+      /* 正解強調（提高優先度，避免被錯題底色吃掉） */
       .ans-chip { display:inline-block; padding:2px 8px; border-radius:999px; background: var(--ans-chip-bg); color: var(--ans-chip-fg); font-size:.9em; margin-right:6px; }
-      .ans-cell  { background: var(--ans-row-bg); border-left: 3px solid var(--ans-row-bd); }
-      .opt-row { display:block; padding:4px 6px; margin:2px 0; border-radius:6px; }
-      .opt-row.is-correct { background: var(--ans-row-bg); border-left: 3px solid var(--ans-row-bd); }
+      .ans-cell  { background: var(--ans-row-bg) !important; border-left: 3px solid var(--ans-row-bd) !important; color: var(--txt) !important; }
+      .opt-row   { display:block; padding:4px 6px; margin:2px 0; border-radius:6px; }
+      .opt-row.is-correct { background: var(--ans-row-bg) !important; border-left: 3px solid var(--ans-row-bd) !important; color: var(--txt) !important; }
+      tr.wrong td.ans-cell { background: var(--ans-row-bg) !important; color: var(--txt) !important; }
 
       /* 右上角按鈕固定 */
       #darkModeToggle, #homeBtn {
@@ -118,23 +123,28 @@
         #homeBtn { top: 56px; }
       }
       @media (max-width: 540px) {
-        /* 手機上把「您的答案」隱藏，保留題目/正解/OX，避免擠爆 */
+        /* 手機上把「您的答案」隱藏，保留題目/正解/OX */
         #results table th:nth-child(2), #results table td:nth-child(2) { display:none; }
       }
       @media (max-width: 420px) {
         #bank .controls { display: grid; grid-template-columns: 1fr; gap: 8px; }
       }
 
-      /* —— 新增：超大螢幕加碼放大 —— */
-      @media (min-width: 1600px) {
-        body { font-size: clamp(18px, 0.6vw + 12px, 24px); }
-        #container { max-width: 1400px; }
-        h1, h2 { font-size: 2rem; }
+      /* —— 大螢幕加碼放大 —— */
+      @media (min-width: 1200px) {
+        body       { font-size: clamp(18px, 0.9vw + 12px, 26px); }
+        #container { max-width: 1440px; }
+        h1, h2     { font-size: 2rem; }
       }
-      @media (min-width: 2200px) {
-        body { font-size: clamp(20px, 0.5vw + 14px, 26px); }
-        #container { max-width: 1600px; }
-        h1, h2 { font-size: 2.2rem; }
+      @media (min-width: 1800px) {
+        body       { font-size: clamp(20px, 0.7vw + 12px, 28px); }
+        #container { max-width: 1680px; }
+        h1, h2     { font-size: 2.2rem; }
+      }
+      @media (min-width: 2400px) {
+        body       { font-size: clamp(22px, 0.6vw + 14px, 32px); }
+        #container { max-width: 1920px; }
+        h1, h2     { font-size: 2.4rem; }
       }
 
       /* 預載深色（head 腳本使用），load 後會移除 */
